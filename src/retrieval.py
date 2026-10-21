@@ -146,8 +146,10 @@ class HybridRetriever:
         if dense_available and self._dense_index is not None:
             query_embedding = self._encode([query])
             query_embedding = self._normalize_embeddings(query_embedding).astype(np.float32)
-            similarities, _ = self._dense_index.search(query_embedding, len(self._chunks))
-            dense_scores = similarities[0]
+            similarities, neighbor_indices = self._dense_index.search(query_embedding, len(self._chunks))
+            for score, idx in zip(similarities[0], neighbor_indices[0]):
+                if idx >= 0:
+                    dense_scores[idx] = score
             dense_norm = self._normalize_scores(dense_scores)
 
         bm25_weight = 1.0 - self.semantic_weight
