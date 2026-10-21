@@ -1,5 +1,7 @@
 import pytest
 import json
+import importlib
+import sys
 from pathlib import Path
 from src.ingestion import clean_text, chunk_text, load_chunk_store, save_chunk_store, add_chunks_to_store
 
@@ -91,3 +93,13 @@ def test_add_chunks_different_ids(tmp_path, monkeypatch):
     add_chunks_to_store([chunk2])
     stored = load_chunk_store()
     assert len(stored) == 2
+
+
+def test_import_ingestion_has_no_bootstrap_side_effects(monkeypatch):
+    def fail_read_csv(*args, **kwargs):
+        raise AssertionError("read_csv should not be called during import")
+
+    monkeypatch.setattr("pandas.read_csv", fail_read_csv)
+    sys.modules.pop("src.ingestion", None)
+    imported = importlib.import_module("src.ingestion")
+    assert hasattr(imported, "bootstrap_from_csv")
