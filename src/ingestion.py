@@ -130,14 +130,3 @@ def bootstrap_from_csv(csv_path: str) -> List[Dict]:
     all_chunks = add_chunks_to_store(chunks)
     print(f"Done. {len(all_chunks)} chunks from {len(get_unique_sources(all_chunks))} sources.")
     return all_chunks
-
-from src.ingestion import bootstrap_from_csv, load_chunk_store, get_unique_sources
-
-# Load CSV into chunk store
-chunks = bootstrap_from_csv("db/Financial-QA-10k.csv")
-
-# Check results
-print(f"Total chunks: {len(chunks)}")
-print(f"Total sources: {len(get_unique_sources(chunks))}")
-print(f"\nSample chunk:")
-print(chunks[0])
